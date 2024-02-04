@@ -12,15 +12,12 @@ SLEEP_TIME = 3600  # One hour
 
 # Define the room types and corresponding folder names
 room_types = {
-    'living_room': 'Living Room',
-    'bedroom': 'Bedroom',
-    'kitchen': 'Kitchen',
-    'bathroom': 'Bathroom',
-    'dining_room': 'Dining Room',
+    "messy room": "Messy Room",
+   
 }
 
 # Create a folder structure to save the images
-base_folder = '/Users/julio/Documents/Home AI Assistant/Family-AI-Assistant/data/images/rooms/clean'
+base_folder = '/Users/julio/Home AI Assistant/Family-AI-Assistant/data/images/rooms/messy'
 room_folders = {}
 
 # Count initial files in each room's folder
