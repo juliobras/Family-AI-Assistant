@@ -93,4 +93,8 @@ cython_debug/
 .vscode/
 
 #Virtual Environment
-myenv/
+homeai/
+
+#Data Folder
+/home/julio/Documents/Family-AI-Assistant/data
+data/
