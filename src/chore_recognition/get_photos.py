@@ -5,19 +5,26 @@ import time
 # Constants
 ACCESS_KEY = 'hPeh4b_JRIgLrUDrp_xGhb8Exvz7vi_STwdRpWaOaxQ'
 API_ENDPOINT = 'https://api.unsplash.com'
-MAX_PHOTOS_PER_ROOM = 5000
+MAX_PHOTOS_PER_ROOM = 2000
 PHOTOS_PER_BATCH = 500
 REQUEST_LIMIT_PER_HOUR = 50
 SLEEP_TIME = 3600  # One hour
 
 # Define the room types and corresponding folder names
 room_types = {
-    "messy room": "Messy Room",
+    # "living room": "Living Room",
+    # "kitchen": "Kitchen",
+    # "bedroom": "Bedroom",
+    # "Dinning room": "Dinning Room",
+    "untidy": "Untidy",
+    "decluttering": "Decluttering",
+    "cluttered" : "Cluttered"
+
    
 }
 
 # Create a folder structure to save the images
-base_folder = '/Users/julio/Home AI Assistant/Family-AI-Assistant/data/images/rooms/messy'
+base_folder = 'data/images/rooms/clean'
 room_folders = {}
 
 # Count initial files in each room's folder

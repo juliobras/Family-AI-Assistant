@@ -3,69 +3,73 @@ import tensorflow as tf
 from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.applications.resnet50 import preprocess_input
 from tensorflow.keras.preprocessing import image
-from tensorflow.keras.models import Model
+from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
-import platform
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.optimizers import legacy
-
-# Check the platform
-if platform.system() == 'Darwin':  # Darwin is the system name for macOS
-    # Check for ARM architecture (M1/M2 chips)
-    if platform.machine().startswith('arm') or platform.machine().startswith('aarch64'):
-        optimizer = legacy.Adam()
-    else:
-        optimizer = Adam()
-else:
-    optimizer = Adam()
+import os
 
 class ChoreDetection:
-    def __init__(self, num_classes=2):
-        self.base_model = ResNet50(weights='imagenet', include_top=False)
-        self.model = self._build_model(num_classes)
-        self._compile_model()
+    def __init__(self, model_path=None):
+        if model_path:
+            self.model = load_model(model_path)
+        else:
+            self.model = self.initialize_model()
 
-    
-
-    def _build_model(self, num_classes):
-        for layer in self.base_model.layers:
-            layer.trainable = False
-        x = GlobalAveragePooling2D()(self.base_model.output)
+    def initialize_model(self):
+        base_model = ResNet50(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
+        x = base_model.output
+        x = GlobalAveragePooling2D()(x)
         x = Dense(1024, activation='relu')(x)
-        predictions = Dense(num_classes, activation='sigmoid' if num_classes == 2 else 'softmax')(x)
-        model = Model(inputs=self.base_model.input, outputs=predictions)
+        predictions = Dense(1, activation='sigmoid')(x)
+        model = Model(inputs=base_model.input, outputs=predictions)
+        
+        for layer in base_model.layers:
+            layer.trainable = False
+            
+        model.compile(optimizer=Adam(learning_rate=0.0001), loss='binary_crossentropy', metrics=['accuracy'])
         return model
 
-    def _compile_model(self):
-        self.model.compile(optimizer=optimizer,
-                           loss='binary_crossentropy',
-                           metrics=['accuracy'])
-
     def preprocess_image(self, image_path):
-        try:
-            img = image.load_img(image_path, target_size=(224, 224))
-            img_array = image.img_to_array(img)
-            img_array = np.expand_dims(img_array, axis=0)
-            img_array = preprocess_input(img_array)
-            return img_array
-        except Exception as e:
-            print(f"An error occurred while preprocessing the image: {e}")
-            return None
+        img = image.load_img(image_path, target_size=(224, 224))
+        img_array = image.img_to_array(img)
+        img_array_expanded = np.expand_dims(img_array, axis=0)
+        return preprocess_input(img_array_expanded)
 
     def predict(self, image_path):
         preprocessed_image = self.preprocess_image(image_path)
-        if preprocessed_image is not None:
-            preds = self.model.predict(preprocessed_image)
-            predicted_class = 'clean' if preds[0][0] < 0.5 else 'messy'
-            return predicted_class
-        else:
-            return "Error processing image"
+        preds = self.model.predict(preprocessed_image)
+        # preds[0] contains the probability of the class being 'Messy'
+        class_prediction = 'Clean' if preds[0] < 0.5 else 'Messy'
+        confidence_score = preds[0] if class_prediction == 'Messy' else 1 - preds[0]
+        return class_prediction, confidence_score
+    def fine_tune(self, train_images, train_labels, val_images, val_labels, epochs=10, learning_rate=0.00002):
+        # Unfreeze some of the top layers of the model
+        for layer in self.model.layers[-20:]:
+            layer.trainable = True
 
+        self.model.compile(optimizer=Adam(learning_rate=learning_rate), 
+                        loss='binary_crossentropy', 
+                        metrics=['accuracy',"AUC","Precision","Recall"])
+
+        # Fine-tune the model
+        history = self.model.fit(train_images, train_labels, 
+                                batch_size=32, 
+                                epochs=epochs, 
+                                validation_data=(val_images, val_labels))
+        return history
+
+    
+
+# Example of how to use the class for prediction
 if __name__ == "__main__":
-    chore_detector = ChoreDetection()
-    image_path = '/Users/julio/Documents/Home AI Assistant/Family-AI-Assistant/data/images/rooms/clean/bathroom/3EsdScyAFuw.jpg'  # Update this to the correct path
-    prediction = chore_detector.predict(image_path)
-    print(f"The messy room is predicted as: {prediction}")
-    image_path = '/Users/julio/Documents/Home AI Assistant/Family-AI-Assistant/data/images/rooms/clean/bathroom/3EsdScyAFuw.jpg'  # Update this to the correct path
-    prediction = chore_detector.predict(image_path)
-    print(f"The clean room is predicted as: {prediction}")
+    model_path = 'src/chore_recognition/trained_models'  # Specify the path to your saved model
+    chore_detector = ChoreDetection(model_path=model_path)
+
+    folder = '/home/julio/Documents/Family-AI-Assistant/data/test2'  # Update this path to the directory containing your images
+
+    # Assuming chore_detector is an instance of your ChoreDetection class and it's already defined
+    for filename in os.listdir(folder):
+        if filename.lower().endswith(('.png', '.jpg', '.jpeg')):  # Check for image files
+            image_path = os.path.join(folder, filename)
+            prediction = chore_detector.predict(image_path)
+            print(f"The room in {filename} is predicted to be: {prediction}")
