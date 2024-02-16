@@ -98,3 +98,14 @@ homeai/
 #Data Folder
 /home/julio/Documents/Family-AI-Assistant/data
 data/
+
+#Data Folder
+/data
+
+#ubunto config files for GPU
+/clang+llvm-16.0.0-x86_64-linux-gnu-ubuntu-18.04
+/tensorflow
+/clang+llvm-16.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz
+/cuda-keyring_1.1-1_all.deb
+/cuda-repo-ubuntu2204-12-2-local_12.2.2-535.104.05-1_amd64.deb
+/cuda-repo-ubuntu2204-12-2-local_12.2.2-535.104.05-1_amd64.deb
