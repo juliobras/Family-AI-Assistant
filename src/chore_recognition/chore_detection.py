@@ -43,7 +43,7 @@ class ChoreDetection:
         class_prediction = 'Clean' if preds[0] < 0.5 else 'Messy'
         confidence_score = preds[0] if class_prediction == 'Messy' else 1 - preds[0]
         return class_prediction, confidence_score
-    def fine_tune(self, train_images, train_labels, val_images, val_labels, epochs=10, learning_rate=0.00002):
+    def fine_tune(self, train_images, train_labels, val_images, val_labels, epochs=10, learning_rate=0.00001):
         # Unfreeze some of the top layers of the model
         for layer in self.model.layers[-20:]:
             layer.trainable = True
