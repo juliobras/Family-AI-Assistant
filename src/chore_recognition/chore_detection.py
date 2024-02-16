@@ -63,7 +63,7 @@ class ChoreDetection:
 
 # Example of how to use the class for prediction
 if __name__ == "__main__":
-    model_path = 'src/chore_recognition/trained_models'  # Specify the path to your saved model
+    model_path = '/home/julio/Music/trained_models'  # Specify the path to your saved model
     chore_detector = ChoreDetection(model_path=model_path)
 
     folder = '/home/julio/Documents/Family-AI-Assistant/data/test2'  # Update this path to the directory containing your images
