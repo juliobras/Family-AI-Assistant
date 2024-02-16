@@ -97,10 +97,10 @@ homeai/
 
 #Data Folder
 /home/julio/Documents/Family-AI-Assistant/data
-data/
+
 
 #Data Folder
-/data
+data/
 
 #ubunto config files for GPU
 /clang+llvm-16.0.0-x86_64-linux-gnu-ubuntu-18.04
