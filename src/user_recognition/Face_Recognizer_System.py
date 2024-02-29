@@ -1,20 +1,28 @@
 from FaceDatabaseManager import FaceDatabaseManager
 from FaceRecognizer import FaceRecognizer
 from UserInteractionManager import UserInteractionManager
-import cv2
-
+import threading
+import time
 
 class Face_Recognizer_System:
-    # Initialize the classes
-    print("Initializing the Face Recognizer System")
-    database_manager = FaceDatabaseManager()
-    database_manager.load_known_faces()
-    user_interaction_manager = UserInteractionManager(database_manager)
-    face_recognizer = FaceRecognizer(user_interaction_manager)
-    face_recognizer.identify_faces()
+    def __init__(self):
+        print("Initializing the Face Recognizer System")
+        self.database_manager = FaceDatabaseManager()
+        self.database_manager.load_known_faces()
+        self.user_interaction_manager = UserInteractionManager(self.database_manager)
+        self.face_recognizer = FaceRecognizer(self.user_interaction_manager)
+        self.recognizer_thread = threading.Thread(target=self.face_recognizer.identify_faces)
+        self.recognizer_thread.start()
+        self.monitor_recognized_people()
+
+    def monitor_recognized_people(self):
+        while True:
+            current_people = list(self.face_recognizer.currently_recognized_queue.queue)
+            print(f"Currently recognized people are: {', '.join(current_people)}")
+            time.sleep(5)  # Check every 10 seconds
 
 if __name__ == "__main__":
-    # Start the main loop
     Face_Recognizer_System()
+
     
 
