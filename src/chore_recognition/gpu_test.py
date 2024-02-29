@@ -20,5 +20,3 @@ if gpus:
         # Memory growth must be set before GPUs have been initialized
         print(e)
 
-# import tensorflow as tf
-# print(tf.config.list_physical_devices('GPU'))

@@ -86,19 +86,6 @@ def get_data_ready_for_training(data_directory, image_size=(224, 224), validatio
 
     return train_images, train_labels, val_images, val_labels, test_images, test_labels
 
-# Usage:
-# Adjust 'path/to/your/dataset' to the actual dataset path
-# train_images, train_labels, val_images, val_labels, test_images, test_labels = get_data_ready_for_training('path/to/your/dataset')
-
-# Training and validation happens here (as per the existing code)
-
-# After training, evaluate the model on the test set
-# test_loss, test_acc = chore_detector.model.evaluate(test_images, test_labels)
-# print(f'Test accuracy: {test_acc}, Test loss: {test_loss}')
-
-
-# Assume you have a function to get your data ready for training
-# It should return train_images, train_labels, val_images, val_labels
 train_images, train_labels, val_images, val_labels, test_images, test_labels = get_data_ready_for_training(photos_directory)
 
 # Train the model

@@ -93,10 +93,10 @@ class ChoreDetection:
 
 # Example of how to use the class for prediction
 if __name__ == "__main__":
-    model_path = '/home/julio/Music/trained_models/model.h5'  # Specify the exact path to your saved model
+    model_path = '/Users/julio/Home AI Assistant/trained_models 88.00_accuracy'  # Specify the exact path to your saved model
     chore_detector = ChoreDetection(model_path=model_path)
 
-    folder = '/home/julio/Documents/Family-AI-Assistant/data/test2'  # Update this path to the directory containing your images
+    folder = '/Users/julio/Home AI Assistant/data/test2'  # Update this path to the directory containing your images
 
     for filename in os.listdir(folder):
         if filename.lower().endswith(('.png', '.jpg', '.jpeg')):  # Check for image files
