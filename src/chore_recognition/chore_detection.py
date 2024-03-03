@@ -61,7 +61,7 @@ class ChoreDetection:
         """
         preprocessed_image = self.preprocess_image(image_path)
         preds = self.model.predict(preprocessed_image)
-        class_prediction = 'Clean' if preds[0] < 0.5 else 'Messy'
+        class_prediction = 'Clean' if preds[0] < 0.4 else 'Messy'
         confidence_score = preds[0] if class_prediction == 'Messy' else 1 - preds[0]
         return class_prediction, np.float64(confidence_score)
 

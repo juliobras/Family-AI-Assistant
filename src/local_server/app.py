@@ -4,10 +4,12 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import threading
 sys.path.append('/Users/julio/Home AI Assistant/Family-AI-Assistant/src/user_recognition')
+sys.path.append('/Users/julio/Home AI Assistant/Family-AI-Assistant/src/chore_recognition')
 from FaceDatabaseManager import FaceDatabaseManager
 from FaceRecognizer import FaceRecognizer
 from UserInteractionManager import UserInteractionManager
-import time
+from Chore_Recognizer_System import Chore_Recognizer_System  
+
 app = Flask(__name__)
 CORS(app)  # Enable Cross-Origin Resource Sharing
 
@@ -15,6 +17,8 @@ CORS(app)  # Enable Cross-Origin Resource Sharing
 database_manager = FaceDatabaseManager()
 user_interaction_manager = None
 face_recognizer = None
+
+chore_recognizer = Chore_Recognizer_System()
 
 def initialize_face_recognizer_system():
     global user_interaction_manager, face_recognizer,database_manager
@@ -24,6 +28,8 @@ def initialize_face_recognizer_system():
     recognizer_thread = threading.Thread(target=face_recognizer.identify_faces)
     recognizer_thread.daemon = True  # Ensure thread closes when main program exits
     recognizer_thread.start()
+
+  
     print("Face Recognizer System initialized")
     # while True:
     #         current_people = list(face_recognizer.currently_recognized_queue.queue)
@@ -33,15 +39,10 @@ def initialize_face_recognizer_system():
 
 
 @app.route('/checkwhoshome', methods=['POST'])
-
 def check_whos_home():
     people_at_home = list(face_recognizer.currently_recognized_queue.queue)  # Retrieve the current list of recognized people
     request_data = request.get_json()  # Get the JSON payload from the Alexa request
     person = request_data.get('request', {}).get('intent', {}).get('slots', {}).get('Person', {}).get('value', None)
-
-    # Simulated logic for checking if a person is at home
-    #people_at_home = ["James", "Julio"]  # Replace with your actual logic to determine who is at home
-
     response_data = {
         "version": "1.0",
         "response": {
@@ -50,7 +51,7 @@ def check_whos_home():
             },
             "shouldEndSession": True
         }
-    }  # Initialize response data
+    }  
 
     if person:  # If a specific person is asked for
         if person in people_at_home:
@@ -62,10 +63,30 @@ def check_whos_home():
         response_data["people_at_home"] = people_at_home  # Add people at home list
 
     return jsonify(response_data)
-    
 
+@app.route('/house_status', methods=['POST'])    
+def house_status():
+    house_status = chore_recognizer.predict_chore()
+
+    response_data = {
+        "version": "1.0",
+        "response": {
+            "outputSpeech": {
+                "type": "PlainText",
+            },
+            "shouldEndSession": True
+        }
+    }  
+    response_data["house_status"] = house_status  
+   
+
+    return house_status
+    
 
 if __name__ == '__main__':
     initialize_face_recognizer_system()  # Initialize system components
     app.run(debug=True, port=5009)  # Start the Flask server
+
+
+
 
