@@ -2,6 +2,9 @@
 Deals with the identification of faces, including encoding and matching faces against known ones. 
 This class would use face recognition libraries and manage the logic for identifying whether a face is known or unknown.
 """
+
+
+ 
 import cv2
 import face_recognition
 from UserInteractionManager import UserInteractionManager
@@ -10,11 +13,11 @@ import datetime
 import queue
 class FaceRecognizer:
     def __init__(self, interaction_manager: UserInteractionManager):
-        """
-        Initialize with instances of FaceDatabaseManager and UserInteractionManager.
-        face_history (deque): Deque object storing the history of face identifications.
-        history_length (int): Number of past frames to remember for smoothing face identification.
-        """
+        
+        # Initialize with instances of FaceDatabaseManager and UserInteractionManager.
+        # face_history (deque): Deque object storing the history of face identifications.
+        # history_length (int): Number of past frames to remember for smoothing face identification.
+        
         self.history_length = 10
         self.interaction_manager = interaction_manager
         self.face_history = deque(maxlen=self.history_length)
@@ -33,9 +36,9 @@ class FaceRecognizer:
 
 
     def identify_faces(self):
-        """
-        Capture video from the default webcam and identify faces.
-        """
+        
+        # Capture video from the default webcam and identify faces.
+        
         self.currently_recognized_queue = queue.Queue()
         self.cleanup_recognized_users()
         
@@ -63,13 +66,14 @@ class FaceRecognizer:
                             full_frame_location = tuple(map(lambda x: x * 4, face_location))  # Adjust back to full frame size
                             
                             saved_image_path = self.interaction_manager.database_manager.save_unrecognized_face(frame, full_frame_location)
-                            print("User not recognized")
+                            #print("User not recognized")
                             #self.user_response = self.interaction_manager.notify_unrecognized_presence(saved_image_path)
                           
-                            """WILL NEED TO WORK ON AN ALEXA SKILL TO GET THE USER RESPONSE."""
+                            #WILL NEED TO WORK ON AN ALEXA SKILL TO GET THE USER RESPONSE
                             #self.interaction_manager.handle_user_decision(saved_image_path,self.user_response)
 
                         else:
+                            #print("User recognized")
                             self.cleanup_recognized_users()
                             face_distances = face_recognition.face_distance(self.interaction_manager.database_manager.known_face_encodings, face_encoding)
                             best_match_index = face_distances.argmin()
@@ -78,6 +82,8 @@ class FaceRecognizer:
                                 if name not in self.recognized_names_set:
                                     self.recognized_names_set.add(name)
                                     self.currently_recognized_queue.put(name)
+                                    self.face_history.appendleft(name)  # Add the most recently identified name to the left side of the deque
+
 
 
                                 self.currently_recognized[name] = datetime.datetime.now()

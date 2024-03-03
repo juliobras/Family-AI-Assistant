@@ -13,16 +13,24 @@ class Face_Recognizer_System:
         self.face_recognizer = FaceRecognizer(self.user_interaction_manager)
         self.recognizer_thread = threading.Thread(target=self.face_recognizer.identify_faces)
         self.recognizer_thread.start()
-        self.monitor_recognized_people()
+        #self.monitor_recognized_people()
+        # while True:
+        #     current_people = list(self.face_recognizer.currently_recognized_queue.queue)
+        #     print(current_people)
+        #     print(f"Currently recognized people are: {', '.join(current_people)}")
+        #     time.sleep(5)  # Check every 10 seconds
 
     def monitor_recognized_people(self):
-        while True:
+        #while True:
             current_people = list(self.face_recognizer.currently_recognized_queue.queue)
-            print(f"Currently recognized people are: {', '.join(current_people)}")
-            time.sleep(5)  # Check every 10 seconds
+
+            #time.sleep(5)  # Check every 10 seconds
+          
+            return current_people
+
 
 if __name__ == "__main__":
-    Face_Recognizer_System()
+     Face_Recognizer_System()
 
     
 
