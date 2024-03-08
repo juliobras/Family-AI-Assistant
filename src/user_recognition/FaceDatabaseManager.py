@@ -38,3 +38,5 @@ class FaceDatabaseManager:
         cv2.imwrite(file_path, face_image)
         print(f"Saved an image of an unidentified person as {filename}")
         return file_path
+    
+  

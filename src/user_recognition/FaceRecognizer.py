@@ -2,17 +2,21 @@
 Deals with the identification of faces, including encoding and matching faces against known ones. 
 This class would use face recognition libraries and manage the logic for identifying whether a face is known or unknown.
 """
-
-
- 
 import cv2
 import face_recognition
 from UserInteractionManager import UserInteractionManager
 from collections import deque
 import datetime
 import queue
+import sys
+sys.path.append('/Users/julio/Home AI Assistant/Family-AI-Assistant/src/cameras')
+from Camera import SharedLaptopCamera
+
+
+
+
 class FaceRecognizer:
-    def __init__(self, interaction_manager: UserInteractionManager):
+    def __init__(self, interaction_manager: UserInteractionManager, shared_camera:SharedLaptopCamera):
         
         # Initialize with instances of FaceDatabaseManager and UserInteractionManager.
         # face_history (deque): Deque object storing the history of face identifications.
@@ -24,6 +28,7 @@ class FaceRecognizer:
         self.currently_recognized = {}
         self.currently_recognized_queue = queue.Queue()
         self.recognized_names_set = set()
+        self.shared_camera = shared_camera
 
 
     def cleanup_recognized_users(self):
@@ -43,12 +48,15 @@ class FaceRecognizer:
         self.cleanup_recognized_users()
         
 
-        video_capture = cv2.VideoCapture(0)
+
+        #video_capture = cv2.VideoCapture(0)
         process_this_frame = True
 
         while True:
                 self.cleanup_recognized_users()
-                ret, frame = video_capture.read()
+                frame = self.shared_camera.get_frame()
+                if frame is None:
+                    continue  # Skip the rest of the loop if no frame is available
                 small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
                 if process_this_frame:
                     face_locations = face_recognition.face_locations(small_frame)

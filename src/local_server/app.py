@@ -5,10 +5,17 @@ from flask_cors import CORS
 import threading
 sys.path.append('/Users/julio/Home AI Assistant/Family-AI-Assistant/src/user_recognition')
 sys.path.append('/Users/julio/Home AI Assistant/Family-AI-Assistant/src/chore_recognition')
+sys.path.append('/Users/julio/Home AI Assistant/Family-AI-Assistant/src/cameras')
 from FaceDatabaseManager import FaceDatabaseManager
 from FaceRecognizer import FaceRecognizer
 from UserInteractionManager import UserInteractionManager
 from Chore_Recognizer_System import Chore_Recognizer_System  
+from Camera import SharedLaptopCamera  # Assume the class above is saved as laptop_camera.py
+
+
+
+# Later, you can stop the camera when your application is closing or when you don't need it anymore.
+# camera.stop_camera()
 
 app = Flask(__name__)
 CORS(app)  # Enable Cross-Origin Resource Sharing
@@ -17,6 +24,8 @@ CORS(app)  # Enable Cross-Origin Resource Sharing
 database_manager = FaceDatabaseManager()
 user_interaction_manager = None
 face_recognizer = None
+# Initialize global shared camera
+shared_camera = SharedLaptopCamera()
 
 chore_recognizer = Chore_Recognizer_System()
 
@@ -24,7 +33,7 @@ def initialize_face_recognizer_system():
     global user_interaction_manager, face_recognizer,database_manager
     database_manager.load_known_faces()
     user_interaction_manager = UserInteractionManager(database_manager)
-    face_recognizer = FaceRecognizer(user_interaction_manager)
+    face_recognizer = FaceRecognizer(user_interaction_manager,shared_camera)
     recognizer_thread = threading.Thread(target=face_recognizer.identify_faces)
     recognizer_thread.daemon = True  # Ensure thread closes when main program exits
     recognizer_thread.start()
@@ -66,6 +75,9 @@ def check_whos_home():
 
 @app.route('/house_status', methods=['POST'])    
 def house_status():
+    last_frame = shared_camera.get_frame() # Get the last frame from the camera
+    chore_recognizer.save_current_frame(last_frame)
+
     house_status = chore_recognizer.predict_chore()
 
     response_data = {
@@ -84,6 +96,7 @@ def house_status():
     
 
 if __name__ == '__main__':
+  
     initialize_face_recognizer_system()  # Initialize system components
     app.run(debug=True, port=5009)  # Start the Flask server
 
