@@ -13,14 +13,15 @@ class Chore_Recognizer_System:
         self.alexa_response = {"Clean": [], "Messy": []}
         self.current_photos = "/Users/julio/Home AI Assistant/Family-AI-Assistant/src/database/chore_photos" 
         self.count = 0
+        self.file_path = None
 
     def save_current_frame(self, frame):
         self.count += 1
         filename = f"mylocation{self.count}.jpg"
-        file_path = os.path.join(self.current_photos, filename)
-        cv2.imwrite(file_path, frame)
+        self.file_path = os.path.join(self.current_photos, filename)
+        cv2.imwrite(self.file_path, frame)
         
-        return file_path
+        return self.file_path
     
     def predict_chore(self):
         # Ensure alexa_response is correctly formatted to hold the results
@@ -40,10 +41,10 @@ class Chore_Recognizer_System:
                 
                 if class_prediction == "Clean":
                     if  base_filename not in self.alexa_response["Clean"]:
-                        self.alexa_response["Clean"].append(f"{base_filename} with confidence score {round((np.float64(confidence_score) * 100),2 )}%")
+                        self.alexa_response["Clean"].append(f"{base_filename}")# with confidence score {round((np.float64(confidence_score) * 100),2 )}%")
                 else:
                     if  base_filename not in self.alexa_response["Messy"]:
-                        self.alexa_response["Messy"].append(f"{base_filename} with confidence score {round((np.float64(confidence_score) * 100),2 )}%")
+                        self.alexa_response["Messy"].append(f"{base_filename}")# with confidence score {round((np.float64(confidence_score) * 100),2 )}%")
                     
             except Exception as e:  # Consider a more specific exception based on your model's error types
                 print(f"Error processing file {filename}: {e}")

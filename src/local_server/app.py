@@ -46,7 +46,6 @@ def initialize_face_recognizer_system():
     #         print(f"Currently recognized people are: {', '.join(current_people)}")
     #         time.sleep(5)  # Check every 10 seconds
 
-
 @app.route('/checkwhoshome', methods=['POST'])
 def check_whos_home():
     people_at_home = list(face_recognizer.currently_recognized_queue.queue)  # Retrieve the current list of recognized people
