@@ -10,14 +10,15 @@ import datetime
 import queue
 import sys
 sys.path.append('/Users/julio/Home AI Assistant/Family-AI-Assistant/src/cameras')
-from Camera import SharedLaptopCamera
+#from Camera import SharedLaptopCamera
+from Camera import CameraManager
 import threading
 
 
 
 
 class FaceRecognizer:
-    def __init__(self, interaction_manager: UserInteractionManager, shared_camera:SharedLaptopCamera):
+    def __init__(self, interaction_manager: UserInteractionManager, shared_camera:CameraManager):
         
         # Initialize with instances of FaceDatabaseManager and UserInteractionManager.
         # face_history (deque): Deque object storing the history of face identifications.
