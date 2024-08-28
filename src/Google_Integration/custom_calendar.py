@@ -23,7 +23,7 @@ class GoogleCalendar:
     def authenticate(self):
         """
         Authenticates the user using the credentials file and saves the credentials for future use.
-        If existing credentials are invalid or expired, it performs a new login flow.
+        If existing credentials are invalid or expired, it performs a new login flow, make sure to delete the token.pickle file.
         """
         token_pickle = 'token.pickle'
         if os.path.exists(token_pickle):

@@ -27,7 +27,7 @@ CORS(app)
 database_manager = FaceDatabaseManager()
 shared_camera = SharedLaptopCamera()
 chore_recognizer = Chore_Recognizer_System()
-#google_calendar = GoogleCalendar()
+google_calendar = GoogleCalendar()
 
 def format_event(event):
     """
