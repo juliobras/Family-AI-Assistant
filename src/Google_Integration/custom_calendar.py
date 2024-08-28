@@ -6,37 +6,47 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
 class GoogleCalendar:
+    # Define the scopes required for Google Calendar API access
     SCOPES = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/calendar.events']
 
-    CREDENTIALS_FILE = '/Users/julio/Home AI Assistant/Family-AI-Assistant/credentials.json'  # Update this path to where your credentials.json is located
+    # Path to the credentials file obtained from the Google Cloud Console
+    CREDENTIALS_FILE = 'credentials.json'
 
     def __init__(self):
+        """
+        Initializes the GoogleCalendar instance, attempting to authenticate with Google's API.
+        """
         self.creds = None
         self.service = None
         self.authenticate()
 
     def authenticate(self):
+        """
+        Authenticates the user using the credentials file and saves the credentials for future use.
+        If existing credentials are invalid or expired, it performs a new login flow.
+        """
         token_pickle = 'token.pickle'
         if os.path.exists(token_pickle):
             with open(token_pickle, 'rb') as token:
                 self.creds = pickle.load(token)
 
-        # If there are no (valid) credentials available, let the user log in.
         if not self.creds or not self.creds.valid:
             if self.creds and self.creds.expired and self.creds.refresh_token:
                 self.creds.refresh(Request())
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(self.CREDENTIALS_FILE, self.SCOPES)
                 self.creds = flow.run_local_server(port=0)
-            
-            # Save the credentials for the next run
+
             with open(token_pickle, 'wb') as token:
                 pickle.dump(self.creds, token)
 
         self.service = build('calendar', 'v3', credentials=self.creds)
 
     def get_events_for_today(self):
-        # Call the Calendar API
+        """
+        Fetches and prints the calendar events for the current day.
+        :return: A list of events happening today.
+        """
         now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
         end = (datetime.datetime.utcnow() + datetime.timedelta(days=1)).isoformat() + 'Z'
         print('Getting the upcoming events')
@@ -52,31 +62,25 @@ class GoogleCalendar:
             print(start, event['summary'])
 
         return events
+
     def add_event_to_calendar(self, summary, start_time, end_time, description='', location=''):
         """
-        Create and add an event to the Google Calendar.
-
-        :param summary: The summary or title of the event
-        :param start_time: The start time of the event in RFC3339 format
-        :param end_time: The end time of the event in RFC3339 format
-        :param description: The description of the event (optional)
-        :param location: The location of the event (optional)
+        Adds an event to the Google Calendar.
+        :param summary: The summary or title of the event.
+        :param start_time: The start time of the event in RFC3339 format.
+        :param end_time: The end time of the event in RFC3339 format.
+        :param description: The description of the event (optional).
+        :param location: The location of the event (optional).
+        :return: The created event object from the API response.
         """
         event_body = {
             'summary': summary,
-            #'location': location,
-            #'description': description,
-            'start': {
-                'dateTime': start_time
-                
-            },
-            'end': {
-                'dateTime': end_time
-                
-            },
+            'start': {'dateTime': start_time},
+            'end': {'dateTime': end_time},
+            'description': description,
+            'location': location,
         }
 
-        # Call the Calendar API to insert the event
         created_event = self.service.events().insert(calendarId='primary', body=event_body).execute()
         print(f"Created event id: {created_event.get('id')}")
         return created_event
@@ -86,3 +90,4 @@ if __name__ == '__main__':
     calendar = GoogleCalendar()
     events_today = calendar.get_events_for_today()
     print(f"Events today: {events_today}")
+
